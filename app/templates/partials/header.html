@@ -1,0 +1,62 @@
+<div class="wrapper">
+    <aside id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark">
+        <a href="{{ url_for('main.dashboard') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white">
+            <svg class="bi pe-none me-2" width="40" height="32"></svg>
+            <span class="fs-4">Dashboard</span>
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+            <a href="{{ url_for('main.dashboard') }}" class="nav-link text-white {% if title == 'Dashboard' %}active{% endif %}" aria-current="page">
+                <svg class="bi pe-none me-2" width="16" height="16"></svg>
+                Home
+            </a>
+            </li>
+            <li>
+            <a href="{{ url_for('main.categories') }}" class="nav-link text-white {% if title == 'Categories' %}active{% endif %}">
+                <svg class="bi pe-none me-2" width="16" height="16"></svg>
+                Categories
+            </a>
+            </li>
+            <li>
+            <a href="{{ url_for('main.products') }}" class="nav-link text-white {% if title == 'Products' %}active{% endif %}">
+                <svg class="bi pe-none me-2" width="16" height="16"></svg>
+                Products
+            </a>
+            </li>
+            <li>
+            <a href="{{ url_for('main.checkout') }}" class="nav-link text-white {% if title == 'Point Of Sale' %}active{% endif %}">
+                <svg class="bi pe-none me-2" width="16" height="16"></svg>
+                Point Of Sale
+            </a>
+            </li>
+            <li>
+            <a href="{{ url_for('main.sales') }}" class="nav-link text-white {% if title == 'Sales' %}active{% endif %}">
+                <svg class="bi pe-none me-2" width="16" height="16"></svg>
+                Sales
+            </a>
+            </li>
+        </ul>
+        <hr> 
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="rounded-circle me-2"><i class="fa-solid fa-circle-user"></i></span>
+                <strong>{{ current_user.username }}</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                <li>
+                    <a class="dropdown-item" href="#" onclick="document.getElementById('logout-form').submit(); return false;">Sign out</a>
+                </li>
+            </ul>
+        
+            <form id="logout-form" action="{{ url_for('auth.logout') }}" method="POST" style="display: none;">
+            </form>
+        </div>
+        
+    </aside>
+    <div class="main">
+        <nav class="navbar navbar-expand px-3 border-bottom">
+            <button class="btn" id="sidebar-toggle" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </nav>

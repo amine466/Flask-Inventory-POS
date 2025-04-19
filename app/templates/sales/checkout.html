@@ -1,0 +1,178 @@
+{% extends "partials/layout.html" %}
+{% block content %}
+{% include "partials/header.html" %}
+<main class="content px-3 py-2">
+    <div class="container-fluid">
+        <div class="mb-5">
+            <h2>Point Of Sale</h2>
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} text-center">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <form class="row g-3 align-items-end">
+            <!-- Category -->
+            <div class="col-md-4">
+              <label for="category" class="form-label fw-semibold">Category</label>
+              <select class="form-select" id="category" required>
+                <option value="" disabled selected>Select a category</option>
+                {% for category in categories %}
+                  <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+      
+            <!-- Product -->
+            <div class="col-md-4">
+              <label for="product" class="form-label fw-semibold">Product</label>
+              <select class="form-select" id="product" required>
+                <option value="" disabled selected>Select a product</option>
+              </select>
+            </div>
+      
+            <!-- Quantity -->
+            <div class="col-md-2">
+              <label for="productQuantity" class="form-label fw-semibold">Quantity</label>
+              <input type="number" class="form-control" name="quantity" id="productQuantity" placeholder="0" min="0" required>
+            </div>
+      
+            <!-- Add Button -->
+            <div class="col-md-2 d-grid">
+              <button id="add-button" class="btn btn-info text-white">Add Product</button>
+            </div>
+          </form>
+        </div>
+        <div class="row mt-4">
+            <!-- Left Half: Product List -->
+            <div class="col-md-6">
+              <div class="card shadow-sm mb-3">
+                <div class="card-header bg-light fw-bold">Cart</div>
+                <div class="card-body p-2">
+                  <ul id="cart-list" class="list-group list-group-flush">
+                    <!-- Items will be added here -->
+                  </ul>
+                </div>
+              </div>
+            </div>
+          
+            <!-- Right Half: Checkout -->
+            <div class="col-md-6">
+              <div class="card shadow-sm mb-3">
+                <div class="card-header bg-light fw-bold">Checkout</div>
+                <div class="card-body text-center">
+                    <p class="fw-semibold mb-2">Total: <span id="total-amount">$0.00</span></p>
+                    <form id="checkout-form" method="POST" action="{{ url_for('main.checkout') }}">
+                      <input type="hidden" name="cart_data" id="cart-data">
+                      <button type="submit" class="btn btn-success w-50">Confirm Checkout</button>
+                    </form>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>   
+</main>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const categorySelect = document.getElementById("category");
+        const productSelect = document.getElementById("product");
+
+        categorySelect.addEventListener("change", () => {
+            const categoryId = categorySelect.value;
+
+            fetch(`/get-products/${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    productSelect.innerHTML = '<option value="" disabled selected>Select a product</option>';
+
+                    data.forEach(product => {
+                        const option = document.createElement("option");
+                        option.value = product.id;
+                        option.textContent = product.name;
+                        productSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching products:", error);
+                });
+        });
+    });
+</script>
+<script>
+    let cart = [];
+    
+    function updateCartDisplay() {
+      const cartList = document.getElementById("cart-list");
+      const totalAmount = document.getElementById("total-amount");
+    
+      cartList.innerHTML = "";
+      let total = 0;
+    
+      cart.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between align-items-center";
+    
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+    
+        li.innerHTML = `
+          <div>
+            <strong>${item.name}</strong> x${item.quantity}<br>
+            <small>$${item.price.toFixed(2)} each</small>
+          </div>
+          <div>
+            <span class="badge bg-primary rounded-pill me-2">$${itemTotal.toFixed(2)}</span>
+            <button class="btn btn-sm btn-outline-danger remove-btn" data-index="${index}">&times;</button>
+          </div>
+        `;
+        cartList.appendChild(li);
+      });
+    
+      totalAmount.textContent = `$${total.toFixed(2)}`;
+      document.getElementById("cart-data").value = JSON.stringify(cart);
+    }
+    
+    document.getElementById("add-button").addEventListener("click", async function (e) {
+      e.preventDefault();
+    
+      const productId = document.getElementById("product").value;
+      const quantity = parseInt(document.getElementById("productQuantity").value);
+    
+      if (!productId || isNaN(quantity) || quantity <= 0) return;
+    
+      const response = await fetch(`/product/${productId}`);
+      const product = await response.json();
+    
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: quantity
+      });
+    
+      updateCartDisplay();
+      document.getElementById("productQuantity").value = "";
+      document.getElementById("category").selectedIndex = 0;
+      document.getElementById("product").innerHTML = '<option value="" disabled selected>Select a product</option>';
+    });
+    
+    // Handle remove buttons
+    document.getElementById("cart-list").addEventListener("click", function (e) {
+      if (e.target.classList.contains("remove-btn")) {
+        const index = parseInt(e.target.dataset.index);
+        cart.splice(index, 1);
+        updateCartDisplay();
+      }
+    });
+</script>
+{% include "partials/footer.html" %}
+{% endblock content %}

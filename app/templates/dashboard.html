@@ -1,0 +1,109 @@
+{% extends "partials/layout.html" %}
+{% block content %}
+{% include "partials/header.html" %}
+<main class="content px-3 py-2">
+    <div class="container-fluid">
+        <div class="mb-5">
+            <h2>Home</h2>
+        </div>
+        <div class="container my-5">
+            <div class="row g-4">
+                <!-- Categories Card -->
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                    <div class="card border-success shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-2 fs-1 text-success">
+                                <i class="fas fa-list-alt"></i>
+                            </div>
+                            <h5 class="card-title">Categories</h5>
+                            <h2 class="fw-bold text-success">{{ categories_count }}</h2>
+                            <p class="text-muted mb-0">Number of Categories</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Products Card -->
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                    <div class="card border-danger shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-2 fs-1 text-danger">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <h5 class="card-title">Products</h5>
+                            <h2 class="fw-bold text-danger">{{ products_count }}</h2>
+                            <p class="text-muted mb-0">Number of Products</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Transactions Card -->
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                    <div class="card border-primary shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-2 fs-1 text-primary">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <h5 class="card-title">Transactions</h5>
+                            <h2 class="fw-bold text-primary">{{ transactions_today }}</h2>
+                            <p class="text-muted mb-0">Transactions Today</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Sales Card -->
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                    <div class="card border-info shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-2 fs-1 text-info">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <h5 class="card-title">Total Sales</h5>
+                            <h2 class="fw-bold text-info">${{ "%.2f"|format(total_sales_today) }}</h2>
+                            <p class="text-muted mb-0">Total Sales Today</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fa-solid fa-receipt me-2 text-primary"></i>Latest Sales
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Sale ID</th>
+                                <th>Total</th>
+                                <th>Items</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in latest_sales %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>#{{ sale.id }}</td>
+                                <td><strong>${{ "%.2f"|format(sale.total) }}</strong></td>
+                                <td>{{ sale.items|length }}</td>
+                                <td>{{ sale.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No recent sales</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>        
+    </div>
+</main>
+{% include "partials/footer.html" %}
+{% endblock %}
